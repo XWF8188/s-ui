@@ -114,7 +114,7 @@ rm /usr/bin/s-ui
 <details>
    <summary>Click for details</summary>
 
-### Usage
+### Usage 1
 
 **Step 1:** Install Docker
 
@@ -150,6 +150,56 @@ docker run -itd \
 git clone https://github.com/alireza0/s-ui
 git submodule update --init --recursive
 docker build -t s-ui .
+```
+
+### Usage 2
+> Docker compose deployment based on 1Panel
+
+```yml
+version: '3.8'
+services:
+  s-ui:
+    image: alireza7/s-ui:latest
+    container_name: s-ui
+    restart: unless-stopped
+    network_mode: bridge
+    
+    # Limit the size of log files to prevent excessive storage space occupation.
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    ports:
+      # --- Management and subscription port: Bind to 127.0.0.1 to ensure that external networks cannot directly connect. ---
+      - "127.0.0.1:2095:2095"    # Panel management
+      - "127.0.0.1:2096:2096"    # Subscription distribution
+
+      # --- Business node port ---
+      - "50010:50010/tcp"        # Socks 5
+      - "50011:50011/tcp"        # Hysteria 2 (Dual - protocol support)
+      - "50011:50011/udp"
+      - "50012:50012/udp"        # Tuic v5 (The core uses UDP)
+      - "50013-50017:50013-50017/tcp" # Unify the mapping range for other protocols
+
+    volumes:
+      # Database persistence
+      - /opt/1panel/apps/s-ui/db/:/etc/s-ui/
+      
+      # Mount the certificate for the management domain name: directly mount the physical path after the automatic renewal of 1Panel ACME.
+      - /opt/1panel/www/sites/sui.weibreeze.com/ssl/:/root/cert/sui/
+      # Mount the certificate for the subscription domain name: directly mount the physical path after the automatic renewal of 1Panel ACME.
+      - /opt/1panel/www/sites/sub.weibreeze.com/ssl/:/root/cert/sub/
+      
+      # Key: Synchronize the time zone of the host machine to ensure successful encryption handshake.
+      - /etc/localtime:/etc/localtime:ro
+
+    environment:
+      # Log level is optional: debug, info, warn, error
+      - SUI_LOG_LEVEL=info
+      # Database folder name
+      - SUI_DB_FOLDER=db
 ```
 
 </details>
