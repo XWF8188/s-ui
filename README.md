@@ -188,9 +188,9 @@ services:
       - /opt/1panel/apps/s-ui/db/:/etc/s-ui/
       
       # Mount the certificate for the management domain name: directly mount the physical path after the automatic renewal of 1Panel ACME.
-      - /opt/1panel/www/sites/sui.weibreeze.com/ssl/:/root/cert/sui/
+      - /opt/1panel/www/sites/sui.{Your_domain_name}.com/ssl/:/root/cert/sui/
       # Mount the certificate for the subscription domain name: directly mount the physical path after the automatic renewal of 1Panel ACME.
-      - /opt/1panel/www/sites/sub.weibreeze.com/ssl/:/root/cert/sub/
+      - /opt/1panel/www/sites/sub.{Your_domain_name}.com/ssl/:/root/cert/sub/
       
       # Key: Synchronize the time zone of the host machine to ensure successful encryption handshake.
       - /etc/localtime:/etc/localtime:ro
